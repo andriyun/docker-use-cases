@@ -85,8 +85,29 @@ docker build -t dcafe-image .
 
 ## Local dev environment based on docker
 ### Simple drupal env with mysql php
+To make simple env we need to create two containers for php and db
+
+#### Mysql
+```
+docker run --name docker-mysql --restart=unless-stopped -v ./mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal -d mysql
+```
+
+#### Php
+```
+docker run --name docker-php -d -v $(pwd)/drupal:/srv -p 8000:80 --link docker-mysql:mysql skilldlabs/php:7
+```
+
+### Docker compose magic
+
+```
+TBD
+```
 
 ### Open source dockerized drupal
+
+* https://dockerizedrupal.com
+* http://docker4drupal.org/
+
 
 ## Building anf testing project with docker
 ### PHPUnit
