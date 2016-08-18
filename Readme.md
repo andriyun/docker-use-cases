@@ -89,37 +89,59 @@ To make simple env we need to create two containers for php and db
 
 #### Mysql
 ```
-docker run --name docker-mysql --restart=unless-stopped -v ./mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal -d mysql
+docker run --name mysql --restart=unless-stopped -v $(pwd)/mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal -d mysql
 ```
 
 #### Php
 ```
-docker run --name docker-php -d -v $(pwd)/drupal:/srv -p 8000:80 --link docker-mysql:mysql skilldlabs/php:7
+docker run --name php -d -v $(pwd)/drupal:/srv -p 8000:80 --link mysql:mysql php:7.0-alpine php -t /srv -S 0.0.0.0:80
 ```
 
 ### Docker compose magic
 
+docker-compose.yml file
 ```
-TBD
+version: "2"
+
+services:
+  web:
+    image: skilldlabs/php:7
+    ports:
+      - "8000:80"
+    volumes:
+      - ./drupal:/srv
+    links:
+      - mysql:mysql
+    depends_on:
+      - mysql
+    restart: always
+    entrypoint: /srv/build.sh
+
+  mysql:
+    image: mysql
+    volumes:
+      - ./db:/var/lib/mysql:Z
+    environment:
+      MYSQL_DATABASE: d8
+      MYSQL_USER: d8
+      MYSQL_PASSWORD: d8
+      MYSQL_ROOT_PASSWORD: d8root
+    restart: always
 ```
+
+#### Compose docker containers
 
 ### Open source dockerized drupal
 
-* https://dockerizedrupal.com
 * http://docker4drupal.org/
+* https://dockerizedrupal.com
 
-
-## Building anf testing project with docker
-### PHPUnit
 
 ## Tips
 
-Run php simple server
 ```
 php -S localhost:8000
-```
-
-Install drupal site via drush
-```
+alias allismine="sudo chown -R $(whoami):$(whoami) *"
+alias docker-washup="docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)"
 drush si --db-url=mysql://root:root@localhost/drupal -y --notify
 ```
