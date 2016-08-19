@@ -11,7 +11,7 @@ read more: https://docs.docker.com/engine/reference/run/#restart-policies-restar
 Simple container
 
 ```
-docker run --name docker_daemon -d ubuntu ping google.com`
+docker run --name docker_daemon -d ubuntu ping google.com
 ```
 
 Show container logs
@@ -115,12 +115,11 @@ services:
     depends_on:
       - mysql
     restart: always
-    entrypoint: /srv/build.sh
 
   mysql:
     image: mysql
     volumes:
-      - ./db:/var/lib/mysql:Z
+      - ./db:/var/lib/mysql
     environment:
       MYSQL_DATABASE: d8
       MYSQL_USER: d8
@@ -130,6 +129,11 @@ services:
 ```
 
 #### Compose docker containers
+To run environment from docker-compose.yml file just call
+```
+cd path/to/docker-compose/file
+docker-compose up
+```
 
 ### Open source dockerized drupal
 
@@ -140,8 +144,10 @@ services:
 ## Tips
 
 ```
+# Start simple php dev server
 php -S localhost:8000
+
+# Usefull aliases
 alias allismine="sudo chown -R $(whoami):$(whoami) *"
 alias docker-washup="docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)"
-drush si --db-url=mysql://root:root@localhost/drupal -y --notify
 ```
