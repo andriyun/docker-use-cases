@@ -140,6 +140,12 @@ docker-compose up
 * http://docker4drupal.org/
 * https://dockerizedrupal.com
 
+## Useful links
+* [docs.docker.com](https://docs.docker.com/)
+* [Get started tutorial](https://docs.docker.com/engine/getstarted/)
+* [Official docker registry](https://hub.docker.com/)
+* [15 Docker Tips in 5 Minutes](https://speakerdeck.com/bmorearty/15-docker-tips-in-5-minutes)
+* [Docker Cheat Sheet](https://github.com/wsargent/docker-cheat-sheet)
 
 ## Tips
 
