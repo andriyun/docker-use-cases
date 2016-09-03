@@ -11,7 +11,7 @@ Simple container
 docker run -it centos
 ```
 
-### Simple deamon in detached container
+### Simple deamon container in detached mode
 ```
 docker run --name docker_daemon -d \
   --restart=unless-stopped \
