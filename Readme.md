@@ -15,7 +15,7 @@ docker run -it centos
 ```
 docker run --name docker_daemon -d \
   --restart=unless-stopped \
-  -v $(pwd):/scripts \
+  -v $(pwd)/service:/scripts \
   centos \
   /scripts/service.sh
 ```
@@ -40,10 +40,17 @@ docker rm -f docker_daemon
 ### Dockerized mysql deamon
 Run mysql container with restart
 ```
-docker run --name docker-mysql --restart=unless-stopped -v ./mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal -d mysql
+docker run --name docker-mysql -d \
+  --restart=unless-stopped \
+  -v $(pwd)/mysql:/var/lib/mysql \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=drupal \
+  mysql
 ```
+read more: https://hub.docker.com/_/mysql/
 
-Call mysql commain inside container
+Call mysql command inside container
 ```
 docker exec -it docker-mysql mysql -uroot -proot
 ```
