@@ -1,4 +1,4 @@
-# Docker use cases
+# Docker use cases
 ## Docker container as a service
 
 Restart policy option for `run` command
@@ -72,12 +72,13 @@ docker run --rm -v $(pwd):/mounted_dir tool-contaner [args]
 
 Call phpcs from container
 ```
-docker run --rm -v $(pwd):/work docker-phpcs-drupal custom_module
+cd /path/to/the/code
+docker run --rm -v $(pwd):/work phpcs-drupal
 ```
 
 To call phpcbf you need rewrite entrypoint directive
 ```
-docker run --rm -v $(pwd):/work --entrypoint=phpcbf docker-phpcs-drupal --standard=Drupal ./
+docker run --rm -v $(pwd):/work phpcs-drupal phpcbf --standard=Drupal ./
 ```
 
 ### Dockerfile magic
@@ -91,17 +92,20 @@ FROM php:7.0-alpine
 RUN curl -sS https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/bin
 RUN composer global require drupal/coder \
     && ln -s /root/.composer/vendor/squizlabs/php_codesniffer/scripts/phpcs /usr/bin/phpcs \
+    && ln -s /root/.composer/vendor/squizlabs/php_codesniffer/scripts/phpcbf /usr/bin/phpcbf \
     && ln -s /root/.composer/vendor/drupal/coder/coder_sniffer/Drupal /root/.composer/vendor/squizlabs/php_codesniffer/CodeSniffer/Standards/Drupal
+RUN apk add --no-cache patch
 
 # Set environment directives
 VOLUME /work
 WORKDIR /work
-ENTRYPOINT ["phpcs", "--standard=Drupal"]
+CMD ["phpcs", "--standard=Drupal", "."]
 ```
 
 #### Building image process
 ```
-docker build -t dcafe-image .
+cd path/to/Dockerfile
+docker build -t phpcs-drupal .
 ```
 
 ## Local dev environment based on docker
@@ -178,3 +182,4 @@ php -S localhost:8000
 alias allismine="sudo chown -R $(whoami):$(whoami) *"
 alias docker-washup="docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)"
 ```
+free -h
