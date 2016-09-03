@@ -191,7 +191,7 @@ services:
 
 Stop and remove containers
 ```
-docker-compose stop && docker-compose rm
+docker-compose stop && echo "y" | docker-compose rm
 ```
 
 ### Building drupal with gitlab based on docker 
