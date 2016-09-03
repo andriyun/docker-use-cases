@@ -1,4 +1,4 @@
-# Docker use cases
+# Docker use cases
 ## Docker container as a service
 
 Restart policy option for `run` command
@@ -112,27 +112,65 @@ docker build -t phpcs-drupal .
 ### Simple drupal env with mysql php
 To make simple env we need to create two containers for php and db
 
-#### Mysql
+#### Preparation
 ```
-docker run --name mysql --restart=unless-stopped -v $(pwd)/mysql:/var/lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal -d mysql
-```
-
-#### Php
-```
-docker run --name php -d -v $(pwd)/drupal:/srv -p 8000:80 --link mysql:mysql php:7.0-alpine php -t /srv -S 0.0.0.0:80
+drush dl drupal --drupal-project-rename=drupal
 ```
 
-### Docker compose magic
+#### Mysql container start
+```
+docker run --name mysql -d \
+  --restart=unless-stopped \
+  -v $(pwd)/mysql:/var/lib/mysql \
+  -p 3306:3306 \
+  -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=drupal \
+  mysql
+```
 
-docker-compose.yml file
+#### Php container start
+```
+docker run --name php -d \
+  -v $(pwd)/drupal:/srv \
+  -p 8000:80 \
+  --link mysql:mysql \
+  skilldlabs/php:7 \
+  php -t /srv -S 0.0.0.0:80
+```
+[skilldlabs/php:7 Dockerfile](https://github.com/skilld-labs/docker-php/blob/master/php7/Dockerfile)
+
+#### Install drupal
+```
+# enter to container 
+docker exec -it php sh
+
+# install drupal
+composer update
+drush si --db-url=mysql://root:root@mysql/drupal -y
+...
+# exit, stop and remove containers
+exit
+docker stop php mysql && docker rm php mysql
+```
+
+### Docker compose 
+
+To run environment from docker-compose.yml file just call `docker-compose up`
+```
+cd path/to/docker-compose/file
+drush dl drupal --drupal-project-rename=drupal
+docker-compose up -d
+docker-compose exec php sh
+```
+
+#### docker-compose.yml file magic
 ```
 version: "2"
 
 services:
-  web:
+  php:
     image: skilldlabs/php:7
     ports:
-      - "8000:80"
+      - "8001:80"
     volumes:
       - ./drupal:/srv
     links:
@@ -146,24 +184,18 @@ services:
     volumes:
       - ./db:/var/lib/mysql
     environment:
-      MYSQL_DATABASE: d8
-      MYSQL_USER: d8
-      MYSQL_PASSWORD: d8
-      MYSQL_ROOT_PASSWORD: d8root
+      MYSQL_DATABASE: drupal
+      MYSQL_ROOT_PASSWORD: root
     restart: always
 ```
 
-#### Compose docker containers
-To run environment from docker-compose.yml file just call
+Stop and remove containers
 ```
-cd path/to/docker-compose/file
-docker-compose up
+docker-compose stop && docker-compose rm
 ```
 
-### Open source dockerized drupal
-
-* http://docker4drupal.org/
-* https://dockerizedrupal.com
+### Building drupal with gitlab based on docker 
+  
 
 ## Useful links
 * [docs.docker.com](https://docs.docker.com/)
