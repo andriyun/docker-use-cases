@@ -3,24 +3,38 @@
 
 Restart policy option for `run` command
 
-docker run --restart=[unless-stopped/always] [image_name]
-
 read more: https://docs.docker.com/engine/reference/run/#restart-policies-restart
 
-### Example deamon
+### Common commands
 Simple container
-
 ```
-docker run --name docker_daemon -d ubuntu ping google.com
+docker run -it centos
 ```
 
-Show container logs
+### Simple deamon in detached container
+```
+docker run --name docker_daemon -d \
+  --restart=unless-stopped \
+  -v $(pwd):/scripts \
+  centos \
+  /scripts/service.sh
+```
+Cons: it doesn't work after restart.
+
+####Show containers status
+```
+docker ps
+```
+
+####Show container logs
 ```
 docker logs -f docker_daemon
 ```
-Simple daemon container
+
+####Stop and remove docker container
 ```
-docker run --name docker_daemon -d --restart=unless-stopped ubuntu ping google.com
+docker stop docker_daemon && docker rm docker_daemon
+docker rm -f docker_daemon
 ```
 
 ### Dockerized mysql deamon
